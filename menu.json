@@ -1,0 +1,65 @@
+[
+  {
+    "nombre": "Queso - Bocadillo",
+    "descripcion": "Queso doble crema, bocadillo veleño.",
+    "precio": "$14.000",
+    "imagen": "img/queso.jpg",
+    "categoria": "tradicional"
+  },
+  {
+    "nombre": "Pepperoni",
+    "descripcion": "Salsa napolitana, queso doble crema, pepperoni.",
+    "precio": "$18.000",
+    "imagen": "img/pepperoni.jpg",
+    "categoria": "tradicional"
+  },
+  {
+    "nombre": "Hawaiana",
+    "descripcion": "Salsa napolitana, queso doble crema, jamón de cerdo, piña caramelizada.",
+    "precio": "$20.000",
+    "imagen": "img/hawaiana.jpg",
+    "categoria": "tradicional"
+  },
+  {
+    "nombre": "Criolla",
+    "descripcion": "Salsa napolitana, queso doble crema, pollo en crema de la casa, maiz tierno, pimentón.",
+    "precio": "$22.000",
+    "imagen": "img/criolla.jpg",
+    "categoria": "especial"
+  },
+  {
+    "nombre": "Pollo - Champi",
+    "descripcion": "Salsa napolitana, queso doble crema, jamon de cerdo, pollo en crema de la casa, champiñones.",
+    "precio": "$22.000",
+    "imagen": "img/pollo-champi.jpg",
+    "categoria": "especial"
+  },
+  {
+    "nombre": "La especial",
+    "descripcion": "Salsa napolitana, queso doble crema, jamon de cerdo, pollo en crema de la casa, maiz tierno, pepperoni.",
+    "precio": "$22.000",
+    "imagen": "img/especial.jpg",
+    "categoria": "especial"
+  },
+  {
+    "nombre": "Gaseosa x vaso",
+    "descripcion": "Bebida fría.",
+    "precio": "$3.000",
+    "imagen": "img/gaseosa.jpg",
+    "categoria": "bebida"
+  },
+  {
+    "nombre": "Agua x vaso",
+    "descripcion": "Agua fría.",
+    "precio": "$2.000",
+    "imagen": "img/agua.jpg",
+    "categoria": "bebida"
+  },
+  {
+    "nombre": "Promo de la semana",
+    "descripcion": "Por cada 5 pizzas, una pizza queso - bocadillo a mitad de precio. IMPORTANTE: Solo aplica en compras de 5 o más pizzas, enviar comprobante de compra.",
+    "precio": "$7.000",
+    "imagen": "img/promo.jpg",
+    "categoria": "promociones"
+  }
+]
