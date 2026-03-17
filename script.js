@@ -49,7 +49,7 @@ function abrirModal(nombre, descripcion, precio, imagen) {
   document.getElementById("modalImg").src = imagen;
 
   let mensaje = `Hola, quiero pedir la pizza ${nombre} ${precio}`;
-  let url = `https://wa.me/573144144969?text=${encodeURIComponent(mensaje)}`;
+  let url = `https://wa.me/5731443376449?text=${encodeURIComponent(mensaje)}`;
 
   document.getElementById("btnWhatsapp").href = url;
 
@@ -179,7 +179,7 @@ function confirmarPedido() {
 
   mensaje += `TOTAL: $${total}`;
 
-  let url = `https://wa.me/573144144969?text=${encodeURIComponent(mensaje)}`;
+  let url = `https://wa.me/5731443376449?text=${encodeURIComponent(mensaje)}`;
 
   guardarPedido(nombre, carrito, total);
 
