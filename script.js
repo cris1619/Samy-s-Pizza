@@ -200,7 +200,7 @@ function guardarPedido(nombre, carrito, total) {
     cliente: nombre,
     productos: JSON.parse(JSON.stringify(carrito)),
     total: total,
-    fecha: new Date().toLocaleString()
+    fecha: new Date().toISOString()
   };
 
   pedidos.push(nuevoPedido);
