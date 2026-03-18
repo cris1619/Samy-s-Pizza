@@ -171,6 +171,7 @@ function enviarPedido() {
   modal.show();
 }
 
+
 // 🔹 Mostrar/Ocultar campo de dirección
 function toggleDireccion() {
   let tipoEntrega = document.getElementById("tipoEntrega").value;
@@ -183,6 +184,7 @@ function toggleDireccion() {
     direccionInput.value = "";
   }
 }
+
 
 function confirmarPedido() {
 
@@ -197,6 +199,7 @@ function confirmarPedido() {
     mostrarAlerta("⚠️ Ingresa tu nombre y teléfono", "warning");
     return;
   }
+
 
   if (tipoEntrega === "") {
     mostrarAlerta("⚠️ Selecciona un tipo de entrega", "warning");
@@ -218,6 +221,7 @@ function confirmarPedido() {
   let mensaje = "*PEDIDO PIZZERÍA SAMY'S*\n\n";
   mensaje += `Cliente: ${nombre}\n`;
   mensaje += `Teléfono: ${telefono}\n`;
+
   mensaje += `Tipo de entrega: ${tipoEntrega === "fisico" ? "Punto Físico" : "Domicilio"}\n`;
   
   if (tipoEntrega === "domicilio") {
@@ -225,6 +229,7 @@ function confirmarPedido() {
   }
   
   mensaje += `\n`;
+
 
   carrito.forEach(item => {
     let subtotal = item.precio * item.cantidad;
@@ -253,7 +258,9 @@ function confirmarPedido() {
 
   document.getElementById("nombreCliente").value = "";
   document.getElementById("telefonoCliente").value = "";
+
   document.getElementById("tipoEntrega").value = "";
+
   document.getElementById("direccionCliente").value = "";
   document.getElementById("direccionCliente").style.display = "none";
 }
@@ -265,8 +272,10 @@ function guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total)
   let nuevoPedido = {
     cliente: nombre,
     telefono: telefono,
+
     tipoEntrega: tipoEntrega,
     direccion: tipoEntrega === "domicilio" ? direccion : null,
+
     productos: JSON.parse(JSON.stringify(carrito)),
     total: total,
     fecha: new Date().toISOString(),
@@ -368,6 +377,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+});
+
+// Mostrar/ocultar campo de dirección según tipo de entrega
+document.addEventListener("DOMContentLoaded", () => {
+  const tipoSelect = document.getElementById("tipoEntrega");
+  const direccionInput = document.getElementById("direccionCliente");
+
+  if (!tipoSelect || !direccionInput) return;
+
+  const actualizarDireccion = () => {
+    direccionInput.style.display = tipoSelect.value === "domicilio" ? "" : "none";
+  };
+
+  tipoSelect.addEventListener("change", actualizarDireccion);
+  actualizarDireccion();
 });
 
 function cerrarTodosLosModales() {
