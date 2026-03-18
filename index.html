@@ -552,6 +552,15 @@
       <p style="color:var(--texto-muted); font-size:.85rem;">Para coordinar tu pedido</p>
       <input type="text" id="nombreCliente" class="form-control mt-3" placeholder="Nombre completo">
       <input type="tel"  id="telefonoCliente" class="form-control mt-2" placeholder="Teléfono">
+      
+      <select id="tipoEntrega" class="form-control mt-2" onchange="toggleDireccion()">
+        <option value="">Selecciona tipo de entrega</option>
+        <option value="fisico">Punto Físico</option>
+        <option value="domicilio">Domicilio</option>
+      </select>
+      
+      <input type="text" id="direccionCliente" class="form-control mt-2" placeholder="Dirección (número de casa, apto, etc)" style="display:none;">
+      
       <button class="btn btn-success mt-3 w-100" onclick="confirmarPedido()">
         Continuar <i class="bi bi-arrow-right"></i>
       </button>

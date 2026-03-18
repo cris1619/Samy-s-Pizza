@@ -1,12 +1,34 @@
 let menuData = [];
 let enviando = false;
 
-fetch('menu.json')
-  .then(res => res.json())
-  .then(data => {
-    menuData = data;
-    mostrarMenu(data);
+function cargarMenu() {
+  const menuLS = localStorage.getItem("menu");
+  if (menuLS) {
+    menuData = JSON.parse(menuLS);
+    mostrarMenu(menuData);
+    generarBotonesCategorias(menuData);
+  } else {
+    fetch('menu.json')
+      .then(res => res.json())
+      .then(data => {
+        menuData = data;
+        mostrarMenu(data);
+        generarBotonesCategorias(data);
+      });
+  }
+}
+
+function generarBotonesCategorias(data) {
+  const categorias = [...new Set(data.map(p => p.categoria))];
+  const container = document.querySelector('.categorias');
+  container.innerHTML = '<button class="cat-btn cat-todos activo" onclick="filtrar(\'todos\')">Todos</button>';
+  categorias.forEach(cat => {
+    const btnClass = 'cat-' + cat.toLowerCase().replace(' ', '-');
+    container.innerHTML += `<button class="cat-btn ${btnClass}" onclick="filtrar('${cat}')">${cat}</button>`;
   });
+}
+
+cargarMenu();
 
 function mostrarMenu(data) {
 
@@ -138,8 +160,28 @@ function enviarPedido() {
     return;
   }
 
+  // Reset modal fields
+  document.getElementById("nombreCliente").value = "";
+  document.getElementById("telefonoCliente").value = "";
+  document.getElementById("tipoEntrega").value = "";
+  document.getElementById("direccionCliente").value = "";
+  document.getElementById("direccionCliente").style.display = "none";
+
   let modal = new bootstrap.Modal(document.getElementById('clienteModal'));
   modal.show();
+}
+
+// 🔹 Mostrar/Ocultar campo de dirección
+function toggleDireccion() {
+  let tipoEntrega = document.getElementById("tipoEntrega").value;
+  let direccionInput = document.getElementById("direccionCliente");
+  
+  if (tipoEntrega === "domicilio") {
+    direccionInput.style.display = "block";
+  } else {
+    direccionInput.style.display = "none";
+    direccionInput.value = "";
+  }
 }
 
 function confirmarPedido() {
@@ -148,9 +190,21 @@ function confirmarPedido() {
 
   let nombre = document.getElementById("nombreCliente").value.trim();
   let telefono = document.getElementById("telefonoCliente").value.trim();
+  let tipoEntrega = document.getElementById("tipoEntrega").value;
+  let direccion = document.getElementById("direccionCliente").value.trim();
 
   if (nombre === "" || telefono === "") {
     mostrarAlerta("⚠️ Ingresa tu nombre y teléfono", "warning");
+    return;
+  }
+
+  if (tipoEntrega === "") {
+    mostrarAlerta("⚠️ Selecciona un tipo de entrega", "warning");
+    return;
+  }
+
+  if (tipoEntrega === "domicilio" && direccion === "") {
+    mostrarAlerta("⚠️ Ingresa tu dirección para domicilio", "warning");
     return;
   }
 
@@ -163,7 +217,14 @@ function confirmarPedido() {
   let total = 0;
   let mensaje = "*PEDIDO PIZZERÍA SAMY'S*\n\n";
   mensaje += `Cliente: ${nombre}\n`;
-  mensaje += `Teléfono: ${telefono}\n\n`;
+  mensaje += `Teléfono: ${telefono}\n`;
+  mensaje += `Tipo de entrega: ${tipoEntrega === "fisico" ? "Punto Físico" : "Domicilio"}\n`;
+  
+  if (tipoEntrega === "domicilio") {
+    mensaje += `Dirección: ${direccion}\n`;
+  }
+  
+  mensaje += `\n`;
 
   carrito.forEach(item => {
     let subtotal = item.precio * item.cantidad;
@@ -177,7 +238,7 @@ function confirmarPedido() {
 
   let url = `https://wa.me/573143376449?text=${encodeURIComponent(mensaje)}`;
 
-  guardarPedido(nombre, telefono, carrito, total);
+  guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total);
 
   window.open(url, "_blank");
 
@@ -192,15 +253,20 @@ function confirmarPedido() {
 
   document.getElementById("nombreCliente").value = "";
   document.getElementById("telefonoCliente").value = "";
+  document.getElementById("tipoEntrega").value = "";
+  document.getElementById("direccionCliente").value = "";
+  document.getElementById("direccionCliente").style.display = "none";
 }
 
-function guardarPedido(nombre, telefono, carrito, total) {
+function guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total) {
 
   let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
   let nuevoPedido = {
     cliente: nombre,
     telefono: telefono,
+    tipoEntrega: tipoEntrega,
+    direccion: tipoEntrega === "domicilio" ? direccion : null,
     productos: JSON.parse(JSON.stringify(carrito)),
     total: total,
     fecha: new Date().toISOString(),
@@ -325,6 +391,12 @@ function animarCarrito() {
     btn.classList.remove("animar");
   }, 300);
 }
+
+window.addEventListener('storage', (event) => {
+  if (event.key === 'menu') {
+    cargarMenu();
+  }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
 
