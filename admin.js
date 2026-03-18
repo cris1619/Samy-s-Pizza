@@ -148,17 +148,22 @@ async function eliminarPedido(index) {
     try {
       if (useLocalStorage) {
         const pedidos = obtenerPedidosLocal();
+        const nombreCliente = pedidos[index].cliente;
         pedidos.splice(index, 1);
         almacenarPedidosLocal(pedidos);
         pedidosGlobal = pedidos;
         renderPedidos(pedidosGlobal);
+        mostrarAlerta(`❌ Pedido de ${nombreCliente} cancelado`, "warning");
       } else {
         const order = pedidosGlobal[index];
+        const nombreCliente = order.cliente;
         await deleteDoc(doc(window.db, "pedidos", order.id));
         await cargarPedidos();
+        mostrarAlerta(`❌ Pedido de ${nombreCliente} cancelado`, "warning");
       }
     } catch (error) {
       console.error('Error deleting order:', error);
+      mostrarAlerta("❌ Error al cancelar el pedido", "error");
     }
   }
 }
@@ -184,14 +189,44 @@ async function seleccionarMetodoPago(metodo) {
     }
     
     cerrarModalPago();
+    const metodoPagoText = metodo === 'efectivo' ? '💵 Efectivo' : '💳 Transferencia';
+    mostrarAlerta(`✅ Pedido finalizado por ${metodoPagoText}`, "success");
   } catch (error) {
     console.error('Error updating order:', error);
+    mostrarAlerta("❌ Error al finalizar el pedido", "error");
   }
 }
 
 function cerrarModalPago() {
   document.getElementById("modalPago").style.display = "none";
   indexPedidoFinalizando = null;
+}
+
+function mostrarAlerta(mensaje, tipo = "success") {
+  const colores = {
+    success: "bg-success",
+    error: "bg-danger",
+    warning: "bg-warning",
+    info: "bg-primary"
+  };
+
+  const toast = document.createElement("div");
+  toast.className = `toast align-items-center text-white ${colores[tipo]} border-0 show mb-2`;
+
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">
+        ${mensaje}
+      </div>
+      <button class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.parentElement.remove()"></button>
+    </div>
+  `;
+
+  document.getElementById("toastContainer").appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
 
 function cerrarSesion() {
@@ -229,25 +264,28 @@ function renderMenu() {
 
   categorias.forEach(cat => {
     const productos = menuGlobal.filter(p => p.categoria === cat);
-    let productosHTML = "";
-    productos.forEach((p, index) => {
+    
+    let productosHTML = `<div style="margin-bottom:24px;"><h5 style="color:var(--accent); margin-bottom:16px; font-size:18px; font-weight:600;">${cat}</h5><div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:14px;">`;
+    
+    productos.forEach((p) => {
+      const globalIndex = menuGlobal.indexOf(p);
+      const imagenSrc = p.imagen ? p.imagen : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23999" width="100" height="100"/%3E%3C/svg%3E';
+      
       productosHTML += `
-        <div class="pedido-card">
-          <h6>${p.nombre}</h6>
-          <p>${p.descripcion}</p>
-          <p><strong>Precio:</strong> ${p.precio}</p>
-          <p><strong>Imagen:</strong> ${p.imagen}</p>
-          <button class="btn btn-warning btn-sm" onclick="editarProducto(${menuGlobal.indexOf(p)})">Editar</button>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:all 0.2s; display:flex; flex-direction:column;">
+          <img src="${imagenSrc}" style="width:100%; height:140px; object-fit:cover;">
+          <div style="padding:16px; flex:1; display:flex; flex-direction:column;">
+            <h6 style="color:var(--text); margin-bottom:6px; font-size:14px; font-weight:600;">${p.nombre}</h6>
+            <p style="color:var(--muted); font-size:11px; margin-bottom:8px; line-height:1.3; flex:1;">${p.descripcion}</p>
+            <p style="color:var(--accent2); font-size:15px; font-weight:600; margin-bottom:10px;">${p.precio}</p>
+            <button class="btn btn-warning btn-sm" onclick="abrirModalEditar(${globalIndex})" style="width:100%; padding:8px; background:rgba(255,184,0,0.1); color:var(--accent2); border:1px solid var(--accent2); border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; text-transform:uppercase; transition:all 0.2s;">Editar</button>
+          </div>
         </div>
       `;
     });
-
-    contenedor.innerHTML += `
-      <div class="card-custom mb-4">
-        <h5>${cat}</h5>
-        ${productosHTML}
-      </div>
-    `;
+    
+    productosHTML += `</div></div>`;
+    contenedor.innerHTML += productosHTML;
   });
 }
 
@@ -258,12 +296,12 @@ function agregarCategoria() {
     // Actually, since categories are derived from products, to add a category, we can just note it, but to make it visible, perhaps add a placeholder product.
     // For simplicity, just alert that category added, but since no products, it won't show.
     // Better to allow adding category by adding a product to it.
-    alert("Categoría agregada. Ahora puedes agregar productos a ella.");
+    mostrarAlerta("✅ Categoría agregada. Ahora puedes agregar productos a ella.", "success");
     document.getElementById("nuevaCategoria").value = "";
     // To make it show, perhaps add to select, but since renderMenu populates it, call renderMenu after.
     renderMenu();
   } else {
-    alert("Categoría ya existe o inválida.");
+    mostrarAlerta("❌ Categoría ya existe o inválida.", "error");
   }
 }
 
@@ -275,7 +313,7 @@ function agregarProducto() {
   const imagenFile = document.getElementById("imagenProducto").files[0];
 
   if (!nombre || !desc || !precio || !imagenFile) {
-    alert("Todos los campos son requeridos, incluyendo la imagen.");
+    mostrarAlerta("⚠️ Todos los campos son requeridos, incluyendo la imagen.", "warning");
     return;
   }
 
@@ -302,15 +340,63 @@ function agregarProducto() {
 }
 
 
-function editarProducto(index) {
+let indexProductoEditando = null;
+
+function abrirModalEditar(index) {
+  indexProductoEditando = index;
   const producto = menuGlobal[index];
-  // Simple edit: prompt for new values except image
-  const nuevoNombre = prompt("Nuevo nombre:", producto.nombre);
-  const nuevaDesc = prompt("Nueva descripción:", producto.descripcion);
-  const nuevoPrecio = prompt("Nuevo precio:", producto.precio);
-  const nuevaCategoria = prompt("Nueva categoría:", producto.categoria);
+  
+  // Cargar datos del producto
+  document.getElementById("editNombre").value = producto.nombre;
+  document.getElementById("editDescripcion").value = producto.descripcion;
+  document.getElementById("editPrecio").value = producto.precio;
+  
+  // Mostrar imagen
+  const imagenSrc = producto.imagen ? producto.imagen : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23999" width="100" height="100"/%3E%3C/svg%3E';
+  document.getElementById("editImagenPreview").src = imagenSrc;
+  
+  // Llenar select de categoría
+  const selectCategoria = document.getElementById("editCategoria");
+  selectCategoria.innerHTML = "";
+  const categorias = [...new Set(menuGlobal.map(p => p.categoria))];
+  categorias.forEach(cat => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    selectCategoria.appendChild(option);
+  });
+  selectCategoria.value = producto.categoria;
+  
+  document.getElementById("modalEditarProducto").style.display = "flex";
+}
+
+function cerrarModalEditar() {
+  document.getElementById("modalEditarProducto").style.display = "none";
+  indexProductoEditando = null;
+}
+
+// Cerrar modales al hacer click fuera
+document.addEventListener("click", function(event) {
+  const modalEditar = document.getElementById("modalEditarProducto");
+  if (event.target === modalEditar) {
+    cerrarModalEditar();
+  }
+  
+  const modalPago = document.getElementById("modalPago");
+  if (modalPago && event.target === modalPago) {
+    cerrarModalPago();
+  }
+});
+
+function guardarEdicionProducto() {
+  const index = indexProductoEditando;
+  const nuevoNombre = document.getElementById("editNombre").value.trim();
+  const nuevaDesc = document.getElementById("editDescripcion").value.trim();
+  const nuevoPrecio = document.getElementById("editPrecio").value.trim();
+  const nuevaCategoria = document.getElementById("editCategoria").value.trim();
 
   if (nuevoNombre && nuevaDesc && nuevoPrecio && nuevaCategoria) {
+    const producto = menuGlobal[index];
     menuGlobal[index] = {
       ...producto,
       nombre: nuevoNombre,
@@ -320,7 +406,15 @@ function editarProducto(index) {
     };
     localStorage.setItem("menu", JSON.stringify(menuGlobal));
     renderMenu();
+    cerrarModalEditar();
+    mostrarAlerta("✅ Producto actualizado", "success");
+  } else {
+    mostrarAlerta("⚠️ Completa todos los campos", "warning");
   }
+}
+
+function editarProducto(index) {
+  abrirModalEditar(index);
 }
 
 window.addEventListener('storage', (event) => {

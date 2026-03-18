@@ -24,6 +24,10 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html, body {
+      background: var(--bg) !important;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
@@ -246,7 +250,7 @@
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       color: var(--text);
       font-family: var(--font-body);
       font-size: 14px;
@@ -262,6 +266,7 @@
 
     .filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(0.5);
+      cursor: pointer;
     }
 
     .btn-clear {
@@ -317,9 +322,8 @@
       border-radius: var(--radius);
       padding: 20px 24px;
       display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
       transition: all 0.2s;
       cursor: default;
     }
@@ -327,50 +331,37 @@
     .pedido-card:hover {
       border-color: rgba(255,60,0,0.2);
       background: var(--surface2);
-      transform: translateX(4px);
+      transform: translateX(2px);
     }
 
-    .pedido-index {
-      font-family: var(--font-display);
-      font-size: 32px;
-      color: var(--border);
-      min-width: 48px;
-      line-height: 1;
-    }
-
-    .pedido-info {
-      flex: 1;
-    }
-
-    .pedido-cliente {
-      font-weight: 600;
+    .pedido-card h5 {
       font-size: 16px;
-      margin-bottom: 4px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 4px 0;
     }
 
-    .pedido-meta {
+    .pedido-card p {
       font-size: 13px;
       color: var(--muted);
+      margin: 2px 0;
     }
 
-    .pedido-total {
-      font-family: var(--font-display);
-      font-size: 28px;
-      color: var(--green);
-      letter-spacing: 1px;
+    .pedido-card strong {
+      color: var(--text);
     }
 
-    .pedido-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .pedido-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0 0;
     }
 
-    .badge-pending { background: rgba(255,184,0,0.12); color: var(--accent2); }
-    .badge-done    { background: rgba(0,232,122,0.12); color: var(--green); }
+    .pedido-card li {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 2px 0;
+    }
 
     /* SECTION BREAK */
     .section-break {
@@ -544,14 +535,127 @@
     .main > *:nth-child(5) { animation-delay: 0.25s; }
     .main > *:nth-child(6) { animation-delay: 0.30s; }
 
+    #modalEditarProducto[style*="display: flex"] {
+      display: flex !important;
+    }
+
     #modalPago[style*="display: flex"] {
       display: flex !important;
     }
 
-    @media (max-width: 600px) {
-      .sidebar { width: 56px; }
-      .main { margin-left: 56px; padding: 20px 16px; }
+    /* TOASTS */
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      max-width: 400px;
     }
+
+    .toast {
+      background: var(--surface) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
+      margin-bottom: 12px;
+      animation: slideInRight 0.3s ease both;
+    }
+
+    .toast.bg-success {
+      border-color: rgba(0,232,122,0.3) !important;
+      background: linear-gradient(135deg, rgba(0,232,122,0.1) 0%, var(--surface) 100%) !important;
+    }
+
+    .toast.bg-danger {
+      border-color: rgba(255,60,0,0.3) !important;
+      background: linear-gradient(135deg, rgba(255,60,0,0.1) 0%, var(--surface) 100%) !important;
+    }
+
+    .toast.bg-warning {
+      border-color: rgba(255,184,0,0.3) !important;
+      background: linear-gradient(135deg, rgba(255,184,0,0.1) 0%, var(--surface) 100%) !important;
+    }
+
+    .toast.bg-primary {
+      border-color: rgba(91,155,213,0.3) !important;
+      background: linear-gradient(135deg, rgba(91,155,213,0.1) 0%, var(--surface) 100%) !important;
+    }
+
+    .toast-body {
+      color: var(--text) !important;
+      font-weight: 500;
+    }
+
+    .btn-close-white {
+      filter: brightness(0.8);
+    }
+
+    /* Quitar fondos blancos de Bootstrap */
+    input[type="text"],
+    input[type="date"],
+    input[type="tel"],
+    textarea,
+    .form-control {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* CUSTOM BUTTON STYLES */
+    .btn {
+      border-radius: 8px !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+      transition: all 0.2s !important;
+      border: none !important;
+      padding: 8px 16px !important;
+    }
+
+    .btn-success {
+      background: rgba(0,232,122,0.1) !important;
+      color: var(--green) !important;
+      border: 1px solid var(--green) !important;
+    }
+
+    .btn-success:hover {
+      background: rgba(0,232,122,0.2) !important;
+    }
+
+    .btn-danger {
+      background: rgba(255,60,0,0.1) !important;
+      color: var(--accent) !important;
+      border: 1px solid var(--accent) !important;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255,60,0,0.2) !important;
+    }
+
+    .badge {
+      border-radius: 20px !important;
+      padding: 4px 12px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+    }
+
+    .badge.bg-success {
+      background: rgba(0,232,122,0.15) !important;
+      color: var(--green) !important;
+    }
+
   </style>
 </head>
 
@@ -611,7 +715,7 @@
     </div>
 
     <!-- PEDIDOS -->
-    <div class="section-title">Pedidos Recientes</div>
+    <div class="section-title">Pedidos</div>
     <div id="listaPedidos"></div>
 
     <!-- MODAL MÉTODO DE PAGO -->
@@ -621,8 +725,8 @@
         <p style="color:var(--muted); margin-bottom:20px;">Selecciona cómo se realizó el pago:</p>
         
         <div style="display:flex; gap:12px; margin-bottom:24px;">
-          <button onclick="seleccionarMetodoPago('efectivo')" style="flex:1; padding:16px; background:rgba(0,232,122,0.15); border:2px solid var(--green); border-radius:12px; color:var(--green); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="efectivo">💵 Efectivo</button>
-          <button onclick="seleccionarMetodoPago('transferencia')" style="flex:1; padding:16px; background:rgba(255,184,0,0.15); border:2px solid var(--accent2); border-radius:12px; color:var(--accent2); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="transferencia">💳 Transferencia</button>
+          <button onclick="seleccionarMetodoPago('efectivo')" style="flex:1; padding:16px; background:rgba(0,232,122,0.1); border:1px solid var(--green); border-radius:10px; color:var(--green); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="efectivo">💵 Efectivo</button>
+          <button onclick="seleccionarMetodoPago('transferencia')" style="flex:1; padding:16px; background:rgba(255,184,0,0.1); border:1px solid var(--accent2); border-radius:10px; color:var(--accent2); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="transferencia">💳 Transferencia</button>
         </div>
         
         <button onclick="cerrarModalPago()" style="width:100%; padding:12px; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; cursor:pointer; transition:all 0.2s;">Cancelar</button>
@@ -631,7 +735,7 @@
 
     <!-- MENU SECTION -->
     <div class="section-break">
-      <div class="section-title">Gestión del Menú</div>
+      <div class="section-title">Menú</div>
 
       <div class="menu-grid">
 
@@ -678,7 +782,47 @@
       <div id="listaMenu"></div>
     </div>
 
+    <!-- MODAL EDITAR PRODUCTO -->
+    <div id="modalEditarProducto" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:32px; max-width:500px; width:90%; box-shadow:0 20px 40px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto;">
+        <h4 style="color:var(--text); margin-bottom:24px; font-family:var(--font-display); font-size:24px;">Editar Producto</h4>
+        
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Imagen Actual</label>
+          <img id="editImagenPreview" src="" style="width:100%; max-height:180px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Nombre</label>
+          <input type="text" id="editNombre" class="form-control" style="width:100%;">
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Descripción</label>
+          <textarea id="editDescripcion" class="form-control" style="width:100%;" rows="3"></textarea>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Precio</label>
+          <input type="text" id="editPrecio" class="form-control" style="width:100%;">
+        </div>
+
+        <div style="margin-bottom:24px;">
+          <label style="display:block; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Categoría</label>
+          <select id="editCategoria" class="form-control" style="width:100%;"></select>
+        </div>
+        
+        <div style="display:flex; gap:12px;">
+          <button onclick="guardarEdicionProducto()" style="flex:1; padding:12px; background:var(--green); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600; text-transform:uppercase;">Guardar</button>
+          <button onclick="cerrarModalEditar()" style="flex:1; padding:12px; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; cursor:pointer; font-weight:600; text-transform:uppercase;">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container position-fixed end-0 p-3"></div>
 
   <script>
     function cerrarSesion() {
@@ -702,7 +846,9 @@
     }
   </script>
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="admin.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Firebase SDK -->
   <script type="module">
