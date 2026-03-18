@@ -194,8 +194,11 @@ function confirmarPedido() {
   document.getElementById("telefonoCliente").value = "";
 }
 
-async function guardarPedido(nombre, telefono, carrito, total) {
-  const nuevoPedido = {
+function guardarPedido(nombre, telefono, carrito, total) {
+
+  let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+  let nuevoPedido = {
     cliente: nombre,
     telefono: telefono,
     productos: JSON.parse(JSON.stringify(carrito)),
@@ -204,12 +207,9 @@ async function guardarPedido(nombre, telefono, carrito, total) {
     estado: "pendiente"
   };
 
-  try {
-    await addDoc(collection(window.db, "pedidos"), nuevoPedido);
-  } catch (error) {
-    console.error('Error saving order:', error);
-    throw error;
-  }
+  pedidos.push(nuevoPedido);
+
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
 }
 
 function verPedidos() {
