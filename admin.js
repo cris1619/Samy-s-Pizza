@@ -518,11 +518,15 @@ function actualizarEstadisticas() {
   
   let pedidosHoy = 0;
   let completados = 0;
-  
+  let totalVendidoHoy = 0;
+
   pedidosGlobal.forEach(pedido => {
     const fechaPedido = new Date(pedido.fecha);
     if (fechaPedido >= hoyInicio && fechaPedido < hoyFin) {
       pedidosHoy++;
+      if (pedido.estado === 'finalizado') {
+        totalVendidoHoy += pedido.total;
+      }
     }
     if (pedido.estado === 'finalizado') {
       completados++;
@@ -531,9 +535,11 @@ function actualizarEstadisticas() {
   
   const elPedidosHoy = document.getElementById("pedidosHoy");
   const elCompletados = document.getElementById("pedidosCompletados");
-  
+  const elTotalVendidoHoy = document.getElementById("totalVendidoHoy");
+
   if (elPedidosHoy) elPedidosHoy.innerText = pedidosHoy;
   if (elCompletados) elCompletados.innerText = completados;
+  if (elTotalVendidoHoy) elTotalVendidoHoy.innerText = `$${totalVendidoHoy}`;
 }
 
 function buscarProductos() {
