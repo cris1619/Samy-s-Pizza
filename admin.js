@@ -73,7 +73,12 @@ function renderPedidos(pedidos) {
     return;
   }
 
-  pedidos.forEach((pedido, index) => {
+  // Ordenar pedidos del más reciente al más viejo
+  let pedidosOrdenados = [...pedidos].reverse();
+
+  pedidosOrdenados.forEach((pedido, index) => {
+    // Obtener el índice original en pedidosGlobal
+    let indexOriginal = pedidosGlobal.findIndex(p => p === pedido);
     if (pedido.estado === "finalizado") {
       totalGeneral += pedido.total;
     }
@@ -104,12 +109,12 @@ function renderPedidos(pedidos) {
         <strong>Total: $${pedido.total}</strong><br>
 
         ${pedido.estado !== 'finalizado' ? `<button class="btn btn-success btn-sm mt-2 me-2"
-          onclick="finalizarPedido(${index})">
+          onclick="finalizarPedido(${indexOriginal})">
           Finalizar venta
         </button>` : '<span class="badge bg-success">Venta finalizada</span>'}
 
         ${pedido.estado !== 'finalizado' ? `<button class="btn btn-danger btn-sm mt-2"
-          onclick="eliminarPedido(${index})">
+          onclick="eliminarPedido(${indexOriginal})">
           Cancelar pedido
         </button>` : ''}
       </div>
@@ -156,23 +161,33 @@ async function finalizarPedido(index) {
 }
 
 async function eliminarPedido(index) {
-  if (confirm("¿Cancelar este pedido?")) {
-    try {
-      if (useLocalStorage) {
-        const pedidos = obtenerPedidosLocal();
-        pedidos.splice(index, 1);
-        almacenarPedidosLocal(pedidos);
-        pedidosGlobal = pedidos;
-        renderPedidos(pedidosGlobal);
-      } else {
-        const order = pedidosGlobal[index];
-        await deleteDoc(doc(window.db, "pedidos", order.id));
-        await cargarPedidos();
+  const pedido = pedidosGlobal[index];
+  const clienteNombre = pedido.cliente || "Cliente";
+  mostrarConfirmacion(
+    "Cancelar Venta",
+    `Desea cancelar el pedido de ${clienteNombre}? Esta accion no se puede deshacer.`,
+    "❌",
+    async () => {
+      try {
+        if (useLocalStorage) {
+          const pedidos = obtenerPedidosLocal();
+          pedidos.splice(index, 1);
+          almacenarPedidosLocal(pedidos);
+          pedidosGlobal = pedidos;
+          renderPedidos(pedidosGlobal);
+          mostrarAlerta(`Venta de ${clienteNombre} cancelada`, "error");
+        } else {
+          const order = pedidosGlobal[index];
+          await deleteDoc(doc(window.db, "pedidos", order.id));
+          await cargarPedidos();
+          mostrarAlerta(`Venta de ${clienteNombre} cancelada`, "error");
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        mostrarAlerta("Error al cancelar la venta", "error");
       }
-    } catch (error) {
-      console.error('Error deleting order:', error);
     }
-  }
+  );
 }
 
 async function seleccionarMetodoPago(metodo) {
@@ -206,13 +221,42 @@ function cerrarModalPago() {
   indexPedidoFinalizando = null;
 }
 
-function cerrarSesion() {
-  if (confirm("¿Cerrar sesión?")) {
-    mostrarAlerta("👋 Sesión cerrada, regresando...", "success");
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 1500);
+// Variables para el sistema de confirmación
+let accionConfirmacion = null;
+
+function mostrarConfirmacion(titulo, mensaje, icono = "⚠️", accion = null) {
+  document.getElementById("modalConfirmacionTitulo").innerText = titulo;
+  document.getElementById("modalConfirmacionMensaje").innerText = mensaje;
+  document.getElementById("modalConfirmacionIcono").innerText = icono;
+  accionConfirmacion = accion;
+  document.getElementById("modalConfirmacion").style.display = "flex";
+}
+
+function confirmarAccion() {
+  document.getElementById("modalConfirmacion").style.display = "none";
+  if (accionConfirmacion && typeof accionConfirmacion === "function") {
+    accionConfirmacion();
   }
+  accionConfirmacion = null;
+}
+
+function cancelarConfirmacion() {
+  document.getElementById("modalConfirmacion").style.display = "none";
+  accionConfirmacion = null;
+}
+
+function cerrarSesion() {
+  mostrarConfirmacion(
+    "Cerrar Sesión",
+    "¿Estás seguro de que quieres cerrar tu sesión?",
+    "⏻",
+    () => {
+      mostrarAlerta("👋 Sesión cerrada, regresando...", "success");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1500);
+    }
+  );
 }
 
 function cargarMenu() {
@@ -454,12 +498,17 @@ function editarProducto(index) {
 
 function eliminarProducto(index) {
   const producto = menuGlobal[index];
-  if (confirm(`¿Eliminar ${producto.nombre}?`)) {
-    menuGlobal.splice(index, 1);
-    localStorage.setItem("menu", JSON.stringify(menuGlobal));
-    renderMenu();
-    mostrarAlerta("❌ " + producto.nombre + " eliminado", "error");
-  }
+  mostrarConfirmacion(
+    "Eliminar Producto",
+    `¿Está seguro de que desea eliminar "${producto.nombre}"? Esta acción no se puede deshacer.`,
+    "🗑️",
+    () => {
+      menuGlobal.splice(index, 1);
+      localStorage.setItem("menu", JSON.stringify(menuGlobal));
+      renderMenu();
+      mostrarAlerta("🗑️ " + producto.nombre + " eliminado", "error");
+    }
+  );
 }
 
 function actualizarEstadisticas() {
