@@ -4,169 +4,732 @@
   <meta charset="UTF-8">
   <title>Panel Admin - Samy's Pizza</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1e1e1e;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff3c00;
+      --accent2: #ffb800;
+      --green: #00e87a;
+      --text: #f0ece4;
+      --muted: #6b6b6b;
+      --radius: 16px;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: #111;
-      color: white;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .card-custom {
-      background: #1c1c1c;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    /* Ambient glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(255,60,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .header-admin {
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 72px;
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      padding: 24px 0;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      line-height: 1;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      margin-bottom: 24px;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      aspect-ratio: 1;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,60,0,0.12);
+      color: var(--accent);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+    }
+
+    .logout-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255,60,0,0.1);
+      border: 1px solid rgba(255,60,0,0.2);
+      color: var(--accent);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255,60,0,0.25);
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      margin-left: 72px;
+      padding: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 36px;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: 2px;
+      line-height: 0.9;
+      color: var(--text);
+    }
+
+    .page-title span {
+      color: var(--accent);
+    }
+
+    .page-sub {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* STAT CARDS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+
+    .stat-card.accent::before { background: var(--accent); }
+    .stat-card.gold::before { background: var(--accent2); }
+    .stat-card.green::before { background: var(--green); }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 40px;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .stat-card.accent .stat-value { color: var(--accent); }
+    .stat-card.gold .stat-value { color: var(--accent2); }
+    .stat-card.green .stat-value { color: var(--green); }
+
+    .stat-icon {
+      position: absolute;
+      bottom: 16px;
+      right: 20px;
+      font-size: 36px;
+      opacity: 0.08;
+    }
+
+    /* FILTER BAR */
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .filter-bar input {
+      flex: 1;
+      min-width: 180px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .filter-bar input:focus {
+      border-color: var(--accent);
+    }
+
+    .filter-bar input::placeholder { color: var(--muted); }
+
+    .filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+    }
+
+    .btn-clear {
+      background: rgba(255,184,0,0.1);
+      border: 1px solid rgba(255,184,0,0.2);
+      color: var(--accent2);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-clear:hover {
+      background: rgba(255,184,0,0.2);
+    }
+
+    /* SECTION DIVIDER */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* PEDIDO CARDS */
+    #listaPedidos {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .pedido-card {
-      background: #222;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      transition: 0.3s;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      transition: all 0.2s;
+      cursor: default;
     }
 
     .pedido-card:hover {
-      transform: scale(1.01);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      border-color: rgba(255,60,0,0.2);
+      background: var(--surface2);
+      transform: translateX(4px);
     }
 
-    .total-box {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #00ff9d;
+    .pedido-index {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--border);
+      min-width: 48px;
+      line-height: 1;
+    }
+
+    .pedido-info {
+      flex: 1;
+    }
+
+    .pedido-cliente {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .pedido-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pedido-total {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--green);
+      letter-spacing: 1px;
+    }
+
+    .pedido-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-pending { background: rgba(255,184,0,0.12); color: var(--accent2); }
+    .badge-done    { background: rgba(0,232,122,0.12); color: var(--green); }
+
+    /* SECTION BREAK */
+    .section-break {
+      margin: 48px 0 32px;
+    }
+
+    /* MENU MANAGEMENT */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .form-card h5 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+
+    .form-control:focus { border-color: var(--accent); }
+    .form-control::placeholder { color: var(--muted); }
+
+    .form-control[type="file"] {
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      color: white;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+
+    .btn-primary:hover {
+      background: #e03500;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,60,0,0.3);
+    }
+
+    /* MENU ITEMS LIST */
+    #listaMenu {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .menu-item-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .menu-item-card:hover {
+      border-color: rgba(255,60,0,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    .menu-item-img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      background: var(--surface2);
+      display: block;
+    }
+
+    .menu-item-body {
+      padding: 16px;
+    }
+
+    .menu-item-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .menu-item-price {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--green);
+      letter-spacing: 1px;
+    }
+
+    .menu-item-category {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .main > * {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .main > *:nth-child(1) { animation-delay: 0.05s; }
+    .main > *:nth-child(2) { animation-delay: 0.10s; }
+    .main > *:nth-child(3) { animation-delay: 0.15s; }
+    .main > *:nth-child(4) { animation-delay: 0.20s; }
+    .main > *:nth-child(5) { animation-delay: 0.25s; }
+    .main > *:nth-child(6) { animation-delay: 0.30s; }
+
+    #modalPago[style*="display: flex"] {
+      display: flex !important;
+    }
+
+    @media (max-width: 600px) {
+      .sidebar { width: 56px; }
+      .main { margin-left: 56px; padding: 20px 16px; }
     }
   </style>
 </head>
 
 <body>
 
-<div class="container py-4">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">SP</div>
 
-  <!-- HEADER -->
-  <div class="header-admin mb-4">
-    <h2>📋 Panel de Pedidos</h2>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" title="Pedidos" onclick="showSection('pedidos')">📋</button>
+      <button class="nav-btn" title="Menú" onclick="showSection('menu')">🍕</button>
+      <button class="nav-btn" title="Estadísticas" onclick="">📊</button>
+    </nav>
 
-    <button class="btn btn-danger" onclick="cerrarSesion()">
-      Cerrar sesión
-    </button>
-  </div>
-
-  <!-- RESUMEN -->
-  <div class="card-custom mb-4 text-center">
-    <p class="mb-1">Total vendido</p>
-    <div class="total-box" id="totalVentas">$0</div>
-  </div>
-
-  <div class="card-custom mb-4">
-
-  <div class="row g-2">
-
-    <!-- Buscar por cliente -->
-    <div class="col-md-4">
-      <input type="text" id="filtroCliente" class="form-control"
-        placeholder="Buscar cliente o teléfono..."
-        oninput="filtrarPedidos()">
+    <div class="sidebar-bottom">
+      <button class="logout-btn" title="Cerrar sesión" onclick="cerrarSesion()">⏻</button>
     </div>
+  </aside>
 
-    <!-- Fecha desde -->
-    <div class="col-md-3">
-      <input type="date" id="fechaInicio" class="form-control"
-        onchange="filtrarPedidos()">
-    </div>
+  <!-- MAIN -->
+  <main class="main">
 
-    <!-- Fecha hasta -->
-    <div class="col-md-3">
-      <input type="date" id="fechaFin" class="form-control"
-        onchange="filtrarPedidos()">
-    </div>
-
-    <!-- Botón limpiar -->
-    <div class="col-md-2">
-      <button class="btn btn-warning w-100" onclick="limpiarFiltros()">
-        Limpiar
-      </button>
-    </div>
-
-  </div>
-
-</div>
-
-  <!-- LISTA -->
-  <div id="listaPedidos"></div>
-
-</div>
-
-<!-- ═══ MODAL MÉTODO DE PAGO ═══ -->
-<div class="modal fade" id="metodoPagoModal">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background: #1c1c1c; border: 1px solid rgba(212,175,55,.2); color: white;">
-      <div class="modal-header">
-        <h5 class="modal-title">Método de pago</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Panel de<br><span>Pedidos</span></div>
+        <div class="page-sub">Samy's Pizza — Admin</div>
       </div>
-      <div class="modal-body text-center">
-        <p>¿Cómo pagó el cliente?</p>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="metodoPagoAdmin" id="pagoEfectivoAdmin" value="Efectivo" checked>
-          <label class="form-check-label" for="pagoEfectivoAdmin">Efectivo</label>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card accent">
+        <div class="stat-label">Total Vendido</div>
+        <div class="stat-value" id="totalVentas">$0</div>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-label">Pedidos Hoy</div>
+        <div class="stat-value" id="pedidosHoy">0</div>
+        <div class="stat-icon">🛵</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Completados</div>
+        <div class="stat-value" id="pedidosCompletados">0</div>
+        <div class="stat-icon">✅</div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <input type="text" id="filtroCliente" placeholder="🔍  Buscar cliente o teléfono…" oninput="filtrarPedidos()">
+      <input type="date" id="fechaInicio" onchange="filtrarPedidos()">
+      <input type="date" id="fechaFin" onchange="filtrarPedidos()">
+      <button class="btn-clear" onclick="limpiarFiltros()">✕ Limpiar</button>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="section-title">Pedidos Recientes</div>
+    <div id="listaPedidos"></div>
+
+    <!-- MODAL MÉTODO DE PAGO -->
+    <div id="modalPago" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:32px; max-width:400px; width:90%; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+        <h4 style="color:var(--text); margin-bottom:20px; font-family:var(--font-display); font-size:24px;">Método de Pago</h4>
+        <p style="color:var(--muted); margin-bottom:20px;">Selecciona cómo se realizó el pago:</p>
+        
+        <div style="display:flex; gap:12px; margin-bottom:24px;">
+          <button onclick="seleccionarMetodoPago('efectivo')" style="flex:1; padding:16px; background:rgba(0,232,122,0.15); border:2px solid var(--green); border-radius:12px; color:var(--green); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="efectivo">💵 Efectivo</button>
+          <button onclick="seleccionarMetodoPago('transferencia')" style="flex:1; padding:16px; background:rgba(255,184,0,0.15); border:2px solid var(--accent2); border-radius:12px; color:var(--accent2); font-weight:600; cursor:pointer; transition:all 0.2s;" class="metodo-btn" data-metodo="transferencia">💳 Transferencia</button>
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="metodoPagoAdmin" id="pagoTransferenciaAdmin" value="Transferencia">
-          <label class="form-check-label" for="pagoTransferenciaAdmin">Transferencia</label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" onclick="confirmarFinalizarVenta()">Confirmar</button>
+        
+        <button onclick="cerrarModalPago()" style="width:100%; padding:12px; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; cursor:pointer; transition:all 0.2s;">Cancelar</button>
       </div>
     </div>
-  </div>
-</div>
 
-<script src="admin.js"></script>
+    <!-- MENU SECTION -->
+    <div class="section-break">
+      <div class="section-title">Gestión del Menú</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <div class="menu-grid">
 
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        <!-- Agregar Categoría -->
+        <div class="form-card">
+          <h5>🗂 Nueva Categoría</h5>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="nuevaCategoria" placeholder="ej. Pizzas Especiales" class="form-control">
+          </div>
+          <button class="btn-primary" onclick="agregarCategoria()">Agregar Categoría</button>
+        </div>
 
-  // Your Firebase configuration (replace with your actual config)
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+        <!-- Agregar Producto -->
+        <div class="form-card">
+          <h5>🍕 Nuevo Producto</h5>
+          <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" id="categoriaProducto" placeholder="ej. Pizzas" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="nombreProducto" placeholder="ej. Pizza Hawaiana" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea id="descripcionProducto" placeholder="Ingredientes y descripción…" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Precio</label>
+            <input type="text" id="precioProducto" placeholder="ej. $28.000" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Imagen</label>
+            <input type="file" id="imagenProducto" accept="image/*" class="form-control">
+          </div>
+          <button class="btn-primary" onclick="agregarProducto()">Agregar Producto</button>
+        </div>
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+      </div>
 
-  // Make db available globally
-  window.db = db;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.getDocs = getDocs;
-  window.doc = doc;
-  window.updateDoc = updateDoc;
-  window.deleteDoc = deleteDoc;
-</script>
+      <!-- Lista de menú -->
+      <div class="section-title" style="font-size:20px;">Productos en Menú</div>
+      <div id="listaMenu"></div>
+    </div>
+
+  </main>
+
+  <script>
+    function cerrarSesion() {
+      if (confirm('¿Cerrar sesión?')) window.location.href = 'login.html';
+    }
+
+    function filtrarPedidos() { /* conectar con admin.js */ }
+    function limpiarFiltros() {
+      document.getElementById('filtroCliente').value = '';
+      document.getElementById('fechaInicio').value = '';
+      document.getElementById('fechaFin').value = '';
+      filtrarPedidos();
+    }
+
+    function agregarCategoria() { /* conectar con Firebase */ }
+    function agregarProducto() { /* conectar con Firebase */ }
+
+    function showSection(s) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+
+  <script src="admin.js" defer></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc }
+      from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.getDocs = getDocs;
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.deleteDoc = deleteDoc;
+  </script>
 
 </body>
 </html>
