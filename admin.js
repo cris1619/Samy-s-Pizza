@@ -3,6 +3,8 @@ const auth = params.get("auth");
 
 let pedidosGlobal = [];
 let useLocalStorage = false;
+let pedidoAFinalizar = null; // Variable para saber cuál pedido finalizar
+let metodoPagoModal = null; // Modal Bootstrap para seleccionar método de pago
 
 function almacenarPedidosLocal(pedidos) {
   localStorage.setItem("pedidos", JSON.stringify(pedidos));
@@ -75,6 +77,9 @@ function renderPedidos(pedidos) {
       <div class="pedido-card">
         <h5>${pedido.cliente}</h5>
         <p><strong>Teléfono:</strong> ${pedido.telefono || 'No especificado'}</p>
+        <p><strong>Entrega:</strong> ${pedido.tipoEntrega || 'No especificado'}</p>
+        ${pedido.tipoEntrega === 'Domicilio' ? `<p><strong>Dirección:</strong> ${pedido.direccion || 'No especificada'}</p>` : ''}
+        <p><strong>Pago:</strong> ${pedido.metodoPago || 'Pendiente'}</p>
         <small>${pedido.fecha}</small>
         <p><strong>Estado:</strong> ${pedido.estado || 'Pendiente'}</p>
 
@@ -91,6 +96,7 @@ function renderPedidos(pedidos) {
           onclick="eliminarPedido(${index})">
           Cancelar pedido
         </button>` : ''}
+
       </div>
     `;
   });
@@ -129,23 +135,48 @@ function limpiarFiltros() {
   renderPedidos(pedidosGlobal);
 }
 
-async function finalizarPedido(index) {
-  if (confirm("¿Finalizar esta venta? El cliente podrá hacer nuevos pedidos.")) {
-    try {
-      if (useLocalStorage) {
-        const pedidos = obtenerPedidosLocal();
-        pedidos[index].estado = "finalizado";
-        almacenarPedidosLocal(pedidos);
-        pedidosGlobal = pedidos;
-        renderPedidos(pedidosGlobal);
-      } else {
-        const order = pedidosGlobal[index];
-        await updateDoc(doc(window.db, "pedidos", order.id), { estado: "finalizado" });
-        await cargarPedidos();
-      }
-    } catch (error) {
-      console.error('Error updating order:', error);
+function finalizarPedido(index) {
+  // Guarda qué pedido se va a finalizar y muestra el modal para seleccionar el método de pago
+  pedidoAFinalizar = index;
+
+  // Si el pedido ya tiene método de pago guardado, pre-seleccionarlo en el modal.
+  const pedido = pedidosGlobal[index];
+  const metodoActual = pedido?.metodoPago || "Efectivo";
+  const inputMetodo = document.querySelector(`input[name="metodoPagoAdmin"][value="${metodoActual}"]`);
+  if (inputMetodo) inputMetodo.checked = true;
+
+  if (metodoPagoModal) {
+    metodoPagoModal.show();
+  }
+}
+
+async function confirmarFinalizarVenta() {
+  if (pedidoAFinalizar === null) return;
+
+  const selected = document.querySelector('input[name="metodoPagoAdmin"]:checked');
+  const metodoPago = selected?.value || "Efectivo";
+
+  try {
+    if (useLocalStorage) {
+      const pedidos = obtenerPedidosLocal();
+      pedidos[pedidoAFinalizar].estado = "finalizado";
+      pedidos[pedidoAFinalizar].metodoPago = metodoPago;
+      almacenarPedidosLocal(pedidos);
+      pedidosGlobal = pedidos;
+      renderPedidos(pedidosGlobal);
+    } else {
+      const order = pedidosGlobal[pedidoAFinalizar];
+      await updateDoc(doc(window.db, "pedidos", order.id), {
+        estado: "finalizado",
+        metodoPago,
+      });
+      await cargarPedidos();
     }
+  } catch (error) {
+    console.error('Error updating order:', error);
+  } finally {
+    pedidoAFinalizar = null;
+    if (metodoPagoModal) metodoPagoModal.hide();
   }
 }
 
@@ -181,4 +212,13 @@ window.addEventListener('storage', (event) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", cargarPedidos);
+document.addEventListener("DOMContentLoaded", () => {
+  cargarPedidos();
+  // Inicializa el modal de método de pago para poder mostrarlo cuando se finalice una venta.
+  metodoPagoModal = new bootstrap.Modal(document.getElementById('metodoPagoModal'));
+
+  // Si el admin cierra el modal sin confirmar, reseteamos el pedido pendiente.
+  document.getElementById('metodoPagoModal').addEventListener('hidden.bs.modal', () => {
+    pedidoAFinalizar = null;
+  });
+});

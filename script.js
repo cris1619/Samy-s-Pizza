@@ -142,15 +142,24 @@ function enviarPedido() {
   modal.show();
 }
 
+let pedidoTemporal = null;
+
 function confirmarPedido() {
 
   if (enviando) return;
 
   let nombre = document.getElementById("nombreCliente").value.trim();
   let telefono = document.getElementById("telefonoCliente").value.trim();
+  let tipoEntrega = document.getElementById("tipoEntrega").value;
+  let direccion = document.getElementById("direccionCliente").value.trim();
 
   if (nombre === "" || telefono === "") {
     mostrarAlerta("⚠️ Ingresa tu nombre y teléfono", "warning");
+    return;
+  }
+
+  if (tipoEntrega === "domicilio" && direccion === "") {
+    mostrarAlerta("⚠️ Ingresa la dirección para el domicilio", "warning");
     return;
   }
 
@@ -163,7 +172,14 @@ function confirmarPedido() {
   let total = 0;
   let mensaje = "*PEDIDO PIZZERÍA SAMY'S*\n\n";
   mensaje += `Cliente: ${nombre}\n`;
-  mensaje += `Teléfono: ${telefono}\n\n`;
+  mensaje += `Teléfono: ${telefono}\n`;
+  mensaje += `Tipo: ${tipoEntrega === 'domicilio' ? 'Domicilio' : 'Recoger en local'}\n`;
+
+  if (tipoEntrega === "domicilio") {
+    mensaje += `Dirección: ${direccion}\n`;
+  }
+
+  mensaje += "\n";
 
   carrito.forEach(item => {
     let subtotal = item.precio * item.cantidad;
@@ -177,7 +193,7 @@ function confirmarPedido() {
 
   let url = `https://wa.me/573143376449?text=${encodeURIComponent(mensaje)}`;
 
-  guardarPedido(nombre, telefono, carrito, total);
+  guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total);
 
   window.open(url, "_blank");
 
@@ -192,15 +208,21 @@ function confirmarPedido() {
 
   document.getElementById("nombreCliente").value = "";
   document.getElementById("telefonoCliente").value = "";
+  document.getElementById("tipoEntrega").value = "recoger";
+  document.getElementById("direccionCliente").value = "";
+  document.getElementById("direccionCliente").style.display = "none";
 }
 
-function guardarPedido(nombre, telefono, carrito, total) {
+function guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total) {
 
   let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
   let nuevoPedido = {
     cliente: nombre,
     telefono: telefono,
+    tipoEntrega: tipoEntrega === 'domicilio' ? 'Domicilio' : 'Recoger en local',
+    direccion: tipoEntrega === 'domicilio' ? direccion : null,
+    metodoPago: null, // Se asignará cuando el admin finalice la venta
     productos: JSON.parse(JSON.stringify(carrito)),
     total: total,
     fecha: new Date().toISOString(),
@@ -302,6 +324,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+});
+
+// Mostrar/ocultar campo de dirección según tipo de entrega
+document.addEventListener("DOMContentLoaded", () => {
+  const tipoSelect = document.getElementById("tipoEntrega");
+  const direccionInput = document.getElementById("direccionCliente");
+
+  if (!tipoSelect || !direccionInput) return;
+
+  const actualizarDireccion = () => {
+    direccionInput.style.display = tipoSelect.value === "domicilio" ? "" : "none";
+  };
+
+  tipoSelect.addEventListener("change", actualizarDireccion);
+  actualizarDireccion();
 });
 
 function cerrarTodosLosModales() {
