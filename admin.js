@@ -3,10 +3,8 @@ const auth = params.get("auth");
 
 let pedidosGlobal = [];
 let useLocalStorage = false;
-
 let menuGlobal = [];
 let indexPedidoFinalizando = null;
-
 
 function almacenarPedidosLocal(pedidos) {
   localStorage.setItem("pedidos", JSON.stringify(pedidos));
@@ -83,11 +81,9 @@ function renderPedidos(pedidos) {
       <div class="pedido-card">
         <h5>${pedido.cliente}</h5>
         <p><strong>Teléfono:</strong> ${pedido.telefono || 'No especificado'}</p>
-
         ${tipoEntregaHTML}
         ${direccionHTML}
         ${metodoPagoHTML}
-
         <small>${pedido.fecha}</small>
         <p><strong>Estado:</strong> ${pedido.estado || 'Pendiente'}</p>
 
@@ -104,7 +100,6 @@ function renderPedidos(pedidos) {
           onclick="eliminarPedido(${index})">
           Cancelar pedido
         </button>` : ''}
-
       </div>
     `;
   });
@@ -143,11 +138,9 @@ function limpiarFiltros() {
   renderPedidos(pedidosGlobal);
 }
 
-
 async function finalizarPedido(index) {
   indexPedidoFinalizando = index;
   document.getElementById("modalPago").style.display = "flex";
-
 }
 
 async function eliminarPedido(index) {
@@ -341,7 +334,6 @@ window.addEventListener('storage', (event) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   cargarPedidos();
-
   cargarMenu();
   
   // Recargar pedidos cada 2 segundos
@@ -352,5 +344,4 @@ document.addEventListener("DOMContentLoaded", () => {
       renderPedidos(pedidosGlobal);
     }
   }, 2000);
-
 });
