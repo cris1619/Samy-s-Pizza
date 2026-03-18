@@ -75,7 +75,7 @@
     <!-- Buscar por cliente -->
     <div class="col-md-4">
       <input type="text" id="filtroCliente" class="form-control"
-        placeholder="Buscar cliente..."
+        placeholder="Buscar cliente o teléfono..."
         oninput="filtrarPedidos()">
     </div>
 
@@ -108,6 +108,35 @@
 </div>
 
 <script src="admin.js"></script>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+  // Your Firebase configuration (replace with your actual config)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make db available globally
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.doc = doc;
+  window.updateDoc = updateDoc;
+  window.deleteDoc = deleteDoc;
+</script>
 
 </body>
 </html>

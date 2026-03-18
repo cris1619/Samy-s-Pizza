@@ -42,16 +42,10 @@ function filtrar(categoria) {
 
 function abrirModal(nombre, descripcion, precio, imagen) {
 
-
   document.getElementById("modalTitulo").innerText = nombre;
   document.getElementById("modalDesc").innerText = descripcion;
   document.getElementById("modalPrecio").innerText = precio;
   document.getElementById("modalImg").src = imagen;
-
-  let mensaje = `Hola, quiero pedir la pizza ${nombre} ${precio}`;
-  let url = `https://wa.me/573143376449?text=${encodeURIComponent(mensaje)}`;
-
-  document.getElementById("btnWhatsapp").href = url;
 
   let modal = new bootstrap.Modal(document.getElementById('pizzaModal'));
   modal.show();
@@ -153,9 +147,10 @@ function confirmarPedido() {
   if (enviando) return;
 
   let nombre = document.getElementById("nombreCliente").value.trim();
+  let telefono = document.getElementById("telefonoCliente").value.trim();
 
-  if (nombre === "") {
-    mostrarAlerta("⚠️ Ingresa tu nombre", "warning");
+  if (nombre === "" || telefono === "") {
+    mostrarAlerta("⚠️ Ingresa tu nombre y teléfono", "warning");
     return;
   }
 
@@ -167,7 +162,8 @@ function confirmarPedido() {
 
   let total = 0;
   let mensaje = "*PEDIDO PIZZERÍA SAMY'S*\n\n";
-  mensaje += `Cliente: ${nombre}\n\n`;
+  mensaje += `Cliente: ${nombre}\n`;
+  mensaje += `Teléfono: ${telefono}\n\n`;
 
   carrito.forEach(item => {
     let subtotal = item.precio * item.cantidad;
@@ -181,31 +177,39 @@ function confirmarPedido() {
 
   let url = `https://wa.me/573143376449?text=${encodeURIComponent(mensaje)}`;
 
-  guardarPedido(nombre, carrito, total);
+  guardarPedido(nombre, telefono, carrito, total);
 
   window.open(url, "_blank");
+
+  // Limpiar el carrito después de enviar el pedido
+  carrito = [];
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  actualizarContador();
 
   cerrarTodosLosModales();
 
   mostrarAlerta("Pedido listo para enviar en WhatsApp", "success");
 
   document.getElementById("nombreCliente").value = "";
+  document.getElementById("telefonoCliente").value = "";
 }
 
-function guardarPedido(nombre, carrito, total) {
-
-  let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-  let nuevoPedido = {
+async function guardarPedido(nombre, telefono, carrito, total) {
+  const nuevoPedido = {
     cliente: nombre,
+    telefono: telefono,
     productos: JSON.parse(JSON.stringify(carrito)),
     total: total,
-    fecha: new Date().toISOString()
+    fecha: new Date().toISOString(),
+    estado: "pendiente"
   };
 
-  pedidos.push(nuevoPedido);
-
-  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  try {
+    await addDoc(collection(window.db, "pedidos"), nuevoPedido);
+  } catch (error) {
+    console.error('Error saving order:', error);
+    throw error;
+  }
 }
 
 function verPedidos() {
