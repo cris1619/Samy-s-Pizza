@@ -3,9 +3,17 @@ const auth = params.get("auth");
 
 let pedidosGlobal = [];
 
-function cargarPedidos() {
-  pedidosGlobal = JSON.parse(localStorage.getItem("pedidos")) || [];
-  renderPedidos(pedidosGlobal);
+async function cargarPedidos() {
+  try {
+    const querySnapshot = await getDocs(collection(window.db, "pedidos"));
+    pedidosGlobal = [];
+    querySnapshot.forEach((doc) => {
+      pedidosGlobal.push({ id: doc.id, ...doc.data() });
+    });
+    renderPedidos(pedidosGlobal);
+  } catch (error) {
+    console.error('Error loading orders:', error);
+  }
 }
 
 if (auth !== "ok") {
@@ -30,7 +38,9 @@ function renderPedidos(pedidos) {
 
   pedidos.forEach((pedido, index) => {
 
-    totalGeneral += pedido.total;
+    if (pedido.estado === "finalizado") {
+      totalGeneral += pedido.total;
+    }
 
     let productosHTML = "";
 
@@ -43,16 +53,23 @@ function renderPedidos(pedidos) {
     contenedor.innerHTML += `
       <div class="pedido-card">
         <h5>${pedido.cliente}</h5>
+        <p><strong>Teléfono:</strong> ${pedido.telefono || 'No especificado'}</p>
         <small>${pedido.fecha}</small>
+        <p><strong>Estado:</strong> ${pedido.estado || 'Pendiente'}</p>
 
         <ul>${productosHTML}</ul>
 
         <strong>Total: $${pedido.total}</strong><br>
 
-        <button class="btn btn-danger btn-sm mt-2"
+        ${pedido.estado !== 'finalizado' ? `<button class="btn btn-success btn-sm mt-2 me-2"
+          onclick="finalizarPedido(${index})">
+          Finalizar venta
+        </button>` : '<span class="badge bg-success">Venta finalizada</span>'}
+
+        ${pedido.estado !== 'finalizado' ? `<button class="btn btn-danger btn-sm mt-2"
           onclick="eliminarPedido(${index})">
-          Eliminar
-        </button>
+          Cancelar pedido
+        </button>` : ''}
       </div>
     `;
   });
@@ -69,6 +86,7 @@ function filtrarPedidos() {
   let filtrados = pedidosGlobal.filter(pedido => {
 
     let coincideNombre = pedido.cliente.toLowerCase().includes(texto);
+    let coincideTelefono = (pedido.telefono || '').toLowerCase().includes(texto);
 
     let fechaPedido = new Date(pedido.fecha);
     let inicio = fechaInicio ? new Date(fechaInicio) : null;
@@ -79,7 +97,7 @@ function filtrarPedidos() {
     if (inicio && fechaPedido < inicio) coincideFecha = false;
     if (fin && fechaPedido > fin) coincideFecha = false;
 
-    return coincideNombre && coincideFecha;
+    return (coincideNombre || coincideTelefono) && coincideFecha;
   });
 
   renderPedidos(filtrados);
@@ -91,14 +109,26 @@ function limpiarFiltros() {
 
   renderPedidos(pedidosGlobal);
 }
-function eliminarPedido(index) {
-
-  let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-  if (confirm("¿Eliminar este pedido?")) {
-    pedidos.splice(index, 1);
-    localStorage.setItem("pedidos", JSON.stringify(pedidos));
-    cargarPedidos();
+async function finalizarPedido(index) {
+  if (confirm("¿Finalizar esta venta? El cliente podrá hacer nuevos pedidos.")) {
+    try {
+      const order = pedidosGlobal[index];
+      await updateDoc(doc(window.db, "pedidos", order.id), { estado: "finalizado" });
+      await cargarPedidos();
+    } catch (error) {
+      console.error('Error updating order:', error);
+    }
+  }
+}
+async function eliminarPedido(index) {
+  if (confirm("¿Cancelar este pedido?")) {
+    try {
+      const order = pedidosGlobal[index];
+      await deleteDoc(doc(window.db, "pedidos", order.id));
+      await cargarPedidos();
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    }
   }
 }
 
