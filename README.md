@@ -1,63 +1,83 @@
-# Samy's Pizza
+🍕 Sammy’s Pizza - Sistema Web de Pedidos
+📌 Descripción
 
-Sitio web para la pizzería Sam's Pizza.
+Sammy’s Pizza es una aplicación web desarrollada para gestionar el menú de una pizzería y permitir a los clientes realizar pedidos de manera sencilla a través de WhatsApp.
 
-## Configuración de Firebase
+El sistema también incluye un panel de administración básico para gestionar productos y visualizar pedidos, utilizando almacenamiento local en el navegador.
 
-Para que los pedidos persistan en diferentes navegadores, se utiliza Firebase Firestore.
+🚀 Funcionalidades
 
-### Pasos para configurar:
+👤 Cliente
+Visualización del menú de pizzas
+Modal con detalles del producto
+Selección de productos
+Generación de pedido
+Envío del pedido por WhatsApp
 
-1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Crea un nuevo proyecto
-3. Habilita Firestore Database
-4. Ve a Configuración del proyecto > General > Tus apps > Agrega una app web
-5. Copia la configuración de Firebase
+🛠️ Administrador
+Panel de administración sencillo
+Crear, editar y eliminar productos
+Visualización de pedidos realizados
+Persistencia de datos en LocalStorage
 
-### Actualizar archivos:
+🧰 Tecnologías utilizadas
+HTML5
+CSS3
+JavaScript (Vanilla)
+Bootstrap (para diseño responsive)
+LocalStorage (almacenamiento temporal)
+API de WhatsApp (para envío de pedidos)
 
-En `index.html` y `admin.html`, reemplaza la configuración de Firebase:
+📂 Estructura del proyecto
+/sammys-pizza
+│
+├── index.html          # Página principal (cliente)
+├── admin.html          # Panel de administración
+├── css/
+│   └── styles.css
+├── js/
+│   ├── app.js          # Lógica principal
+│   ├── admin.js        # Lógica del administrador
+│   └── storage.js      # Manejo de LocalStorage
+├── assets/
+│   └── images/         # Imágenes de productos
+└── README.md
 
-```javascript
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT_ID.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
-};
-```
+⚙️ Instalación y uso
+Clona el repositorio:
+git clone https://github.com/tu-usuario/sammys-pizza.git
+Abre el proyecto:
+cd sammys-pizza
+Ejecuta el proyecto:
+Abre el archivo index.html en tu navegador
 
-### Reglas de Firestore:
+📲 Funcionamiento del pedido
+El usuario selecciona productos
+Se genera un resumen del pedido
+Se construye un mensaje automáticamente
+Se redirige a WhatsApp con el pedido listo para enviar
 
-En Firebase Console > Firestore Database > Reglas, establece:
+⚠️ Limitaciones actuales
+Los datos se almacenan en LocalStorage (no persistente en servidor)
+No hay autenticación de usuarios
+No hay base de datos real
+El panel admin es básico
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
+🔮 Mejoras futuras
+Integración con base de datos (MySQL / Firebase)
+Backend con Node.js o Laravel
+Autenticación de administrador
+Sistema de pagos en línea
+Historial de pedidos en servidor
+Notificaciones en tiempo real
 
-**Nota:** Para producción, configura reglas de seguridad apropiadas.
+👨‍💻 Autor
 
-## Despliegue en GitHub Pages
+Cristian Solano
+Ingeniería de Sistemas – UNAD
+Tecnologo ADSO - SENA
+Málaga, Santander
 
-1. Sube el código a un repositorio de GitHub
-2. Ve a Settings > Pages
-3. Selecciona la rama `main` y carpeta `/ (root)`
-4. El sitio estará disponible en `https://tuusuario.github.io/turepositorio/`
+📄 Licencia
 
-## Funcionalidades
-
-- Menú interactivo
-- Carrito de compras
-- Envío de pedidos por WhatsApp
-- Panel de administración para gestionar pedidos
-- Persistencia de datos con Firebase</content>
-<parameter name="filePath">c:\Users\nylle\OneDrive\Desktop\pizzeria\Samy-s-Pizza\README.md
+Este proyecto es de uso para Sammy's Pizza
