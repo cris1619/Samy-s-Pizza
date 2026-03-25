@@ -42,17 +42,17 @@
     "categoria": "especial"
   },
   {
-    "nombre": "Gaseosa x vaso",
+    "nombre": "Coca-Cola x vaso",
     "descripcion": "Bebida fría.",
     "precio": "$3.000",
     "imagen": "img/gaseosa.jpg",
     "categoria": "bebida"
   },
   {
-    "nombre": "Agua x vaso",
-    "descripcion": "Agua fría.",
+    "nombre": "Quatro x vaso",
+    "descripcion": "Bebida fría.",
     "precio": "$2.000",
-    "imagen": "img/agua.jpg",
+    "imagen": "img/quatro.jpg",
     "categoria": "bebida"
   },
   {
