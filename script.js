@@ -83,7 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
 // 🔹 Agregar al carrito (llamar desde modal)
 function agregarAlCarrito(nombre, precio) {
 
-  let item = carrito.find(p => p.nombre === nombre);
+  let porciones = document.getElementById("porcionesPizzaModal").value;
+
+  let item = carrito.find(p => p.nombre === nombre && p.porciones === porciones);
 
   if (item) {
     item.cantidad++;
@@ -91,7 +93,8 @@ function agregarAlCarrito(nombre, precio) {
     carrito.push({
       nombre,
       precio: parseInt(precio.replace(/\D/g, "")),
-      cantidad: 1
+      cantidad: 1,
+      porciones: porciones
     });
   }
   animarCarrito();
@@ -129,8 +132,8 @@ function abrirCarrito() {
     lista.innerHTML += `
       <div class="item-carrito">
         <div>
-          <strong>${item.nombre}</strong><br>
-          $${item.precio} c/u
+          <strong>${item.nombre}</strong> (${item.porciones} porciones)<br>
+          ${item.precio} c/u
         </div>
 
         <div class="controles">
@@ -200,7 +203,6 @@ function confirmarPedido() {
 
   let nombre = document.getElementById("nombreCliente").value.trim();
   let telefono = document.getElementById("telefonoCliente").value.trim();
-  let porciones = document.getElementById("porcionesPizza").value;
   let tipoEntrega = document.getElementById("tipoEntrega").value;
   let direccion = document.getElementById("direccionCliente").value.trim();
 
@@ -212,11 +214,6 @@ function confirmarPedido() {
 
   if (tipoEntrega === "") {
     mostrarAlerta("⚠️ Selecciona un tipo de entrega", "warning");
-    return;
-  }
-
-  if (porciones === "") {
-    mostrarAlerta("⚠️ Selecciona en cuántas porciones quieres tu pizza", "warning");
     return;
   }
 
@@ -236,10 +233,6 @@ function confirmarPedido() {
   mensaje += `Cliente: ${nombre}\n`;
   mensaje += `Teléfono: ${telefono}\n`;
 
-  if (porciones) {
-    mensaje += `Porciones: ${porciones}\n`;
-  }
-
   mensaje += `Tipo de entrega: ${tipoEntrega === "fisico" ? "Punto Físico" : "Domicilio"}\n`;
   
   if (tipoEntrega === "domicilio") {
@@ -255,8 +248,8 @@ function confirmarPedido() {
     let subtotal = item.precio * item.cantidad;
     total += subtotal;
 
-    mensaje += `${item.nombre}\n`;
-    mensaje += `${item.cantidad} x $${item.precio} = $${subtotal}\n\n`;
+    mensaje += `${item.nombre} (${item.porciones} porciones)\n`;
+    mensaje += `${item.cantidad} x ${item.precio} = ${subtotal}\n\n`;
   });
 
   mensaje += `TOTAL: $${total}`;

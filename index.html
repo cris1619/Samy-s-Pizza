@@ -495,6 +495,13 @@
           <h3 id="modalTitulo" class="mb-3 fw-bold" style="color: #ff3c00; font-family: 'Playfair Display', serif;"></h3>
           <p id="modalDesc" class="mb-3 text-muted" style="font-size: 1.1rem; line-height: 1.5;"></p>
           <h4 id="modalPrecio" class="mb-4 fw-bold" style="color: #ffd700; font-size: 1.5rem;"></h4>
+          <div class="mb-4 mx-auto" style="max-width: 220px;">
+            <select id="porcionesPizzaModal" class="form-control text-center">
+              <option value="2">2 porciones</option>
+              <option value="4">4 porciones</option>
+              <option value="6">6 porciones</option>
+            </select>
+          </div>
           <div class="d-flex justify-content-center">
             <button class="btn btn-danger px-4 py-2 fw-bold rounded-pill shadow-sm" onclick="agregarAlCarrito(
                 document.getElementById('modalTitulo').innerText,
@@ -553,13 +560,6 @@
 
       <input type="text" id="nombreCliente" class="form-control mt-3" placeholder="Nombre completo">
       <input type="tel"  id="telefonoCliente" class="form-control mt-2" placeholder="Teléfono">
-
-      <select id="porcionesPizza" class="form-control mt-2">
-        <option value="">¿En cuántas porciones?</option>
-        <option value="2">2 porciones</option>
-        <option value="4">4 porciones</option>
-        <option value="6">6 porciones</option>
-      </select>
 
       <select id="tipoEntrega" class="form-control mt-2" onchange="toggleDireccion()">
         <option value="">Selecciona tipo de entrega</option>
