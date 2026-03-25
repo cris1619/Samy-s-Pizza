@@ -159,4 +159,4 @@ Abre el archivo `index.html` con la extensión **Live Server** de VS Code.
 ## 📄 Licencia
 
 Este proyecto fue desarrollado con fines exclusivos para **Sammy's Pizza**.  
-Todos los derechos reservados © 2025.
+Todos los derechos reservados © 2026.
