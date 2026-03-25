@@ -37,7 +37,7 @@
   {
     "nombre": "La especial",
     "descripcion": "Salsa napolitana, queso doble crema, jamon de cerdo, pollo en crema de la casa, maiz tierno, pepperoni.",
-    "precio": "$22.000",
+    "precio": "$25.000",
     "imagen": "img/especial.jpg",
     "categoria": "especial"
   },
@@ -54,12 +54,5 @@
     "precio": "$2.000",
     "imagen": "img/quatro.jpg",
     "categoria": "bebida"
-  },
-  {
-    "nombre": "Promo de la semana",
-    "descripcion": "Por cada 5 pizzas, una pizza queso - bocadillo a mitad de precio. IMPORTANTE: Solo aplica en compras de 5 o más pizzas, enviar comprobante de compra.",
-    "precio": "$7.000",
-    "imagen": "img/promo.jpg",
-    "categoria": "promociones"
   }
 ]
