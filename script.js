@@ -276,7 +276,7 @@ function confirmarPedido() {
 
   mensaje += `TOTAL: $${total}`;
 
-  let url = `https://wa.me/573143376449?text=${encodeURIComponent(mensaje)}`;
+  let url = `https://wa.me/573144144969?text=${encodeURIComponent(mensaje)}`;
 
   guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total);
 
