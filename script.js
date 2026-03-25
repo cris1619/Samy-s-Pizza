@@ -70,6 +70,16 @@ function abrirModal(nombre, descripcion, precio, imagen) {
   document.getElementById("modalPrecio").innerText = precio;
   document.getElementById("modalImg").src = imagen;
 
+  let producto = menuData.find(p => p.nombre === nombre);
+  let porcionesDiv = document.getElementById("porcionesDiv");
+
+  if (producto.categoria.toLowerCase() === "bebida") {
+    porcionesDiv.style.display = "none";
+  } else {
+    porcionesDiv.style.display = "block";
+    document.getElementById("porcionesPizzaModal").value = ""; // Reset
+  }
+
   let modal = new bootstrap.Modal(document.getElementById('pizzaModal'));
   modal.show();
 }
@@ -83,7 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
 // 🔹 Agregar al carrito (llamar desde modal)
 function agregarAlCarrito(nombre, precio) {
 
-  let porciones = document.getElementById("porcionesPizzaModal").value;
+  let producto = menuData.find(p => p.nombre === nombre);
+  let porciones = "N/A"; // Valor por defecto para bebidas
+
+  if (producto.categoria.toLowerCase() !== "bebida") {
+    porciones = document.getElementById("porcionesPizzaModal").value;
+    if (porciones === "") {
+      mostrarAlerta("⚠️ Por favor, selecciona en cuántas porciones dividir la pizza", "warning");
+      return;
+    }
+  }
 
   let item = carrito.find(p => p.nombre === nombre && p.porciones === porciones);
 
@@ -94,7 +113,8 @@ function agregarAlCarrito(nombre, precio) {
       nombre,
       precio: parseInt(precio.replace(/\D/g, "")),
       cantidad: 1,
-      porciones: porciones
+      porciones: porciones,
+      categoria: producto.categoria
     });
   }
   animarCarrito();
@@ -132,7 +152,8 @@ function abrirCarrito() {
     lista.innerHTML += `
       <div class="item-carrito">
         <div>
-          <strong>${item.nombre}</strong> (${item.porciones} porciones)<br>
+          <strong>${item.nombre}</strong>
+          ${item.categoria.toLowerCase() !== 'bebida' ? `(${item.porciones} porciones)` : ''}<br>
           ${item.precio} c/u
         </div>
 
@@ -248,7 +269,8 @@ function confirmarPedido() {
     let subtotal = item.precio * item.cantidad;
     total += subtotal;
 
-    mensaje += `${item.nombre} (${item.porciones} porciones)\n`;
+    let textoPorciones = item.categoria.toLowerCase() !== 'bebida' ? ` (${item.porciones} porciones)` : '';
+    mensaje += `${item.nombre}${textoPorciones}\n`;
     mensaje += `${item.cantidad} x ${item.precio} = ${subtotal}\n\n`;
   });
 
