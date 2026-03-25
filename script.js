@@ -193,6 +193,7 @@ function confirmarPedido() {
 
   let nombre = document.getElementById("nombreCliente").value.trim();
   let telefono = document.getElementById("telefonoCliente").value.trim();
+  let porciones = document.getElementById("porcionesPizza").value;
   let tipoEntrega = document.getElementById("tipoEntrega").value;
   let direccion = document.getElementById("direccionCliente").value.trim();
 
@@ -204,6 +205,11 @@ function confirmarPedido() {
 
   if (tipoEntrega === "") {
     mostrarAlerta("⚠️ Selecciona un tipo de entrega", "warning");
+    return;
+  }
+
+  if (porciones === "") {
+    mostrarAlerta("⚠️ Selecciona en cuántas porciones quieres tu pizza", "warning");
     return;
   }
 
@@ -222,6 +228,10 @@ function confirmarPedido() {
   let mensaje = "*PEDIDO PIZZERÍA SAMY'S*\n\n";
   mensaje += `Cliente: ${nombre}\n`;
   mensaje += `Teléfono: ${telefono}\n`;
+
+  if (porciones) {
+    mensaje += `Porciones: ${porciones}\n`;
+  }
 
   mensaje += `Tipo de entrega: ${tipoEntrega === "fisico" ? "Punto Físico" : "Domicilio"}\n`;
   
@@ -259,6 +269,7 @@ function confirmarPedido() {
 
   document.getElementById("nombreCliente").value = "";
   document.getElementById("telefonoCliente").value = "";
+  document.getElementById("porcionesPizza").value = "";
 
   document.getElementById("tipoEntrega").value = "";
 
