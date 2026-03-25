@@ -177,12 +177,19 @@ function enviarPedido() {
 function toggleDireccion() {
   let tipoEntrega = document.getElementById("tipoEntrega").value;
   let direccionInput = document.getElementById("direccionCliente");
+  let infoPuntoFisico = document.getElementById("infoPuntoFisico");
   
   if (tipoEntrega === "domicilio") {
     direccionInput.style.display = "block";
+    infoPuntoFisico.style.display = "none";
+  } else if (tipoEntrega === "fisico") {
+    direccionInput.style.display = "none";
+    direccionInput.value = "";
+    infoPuntoFisico.style.display = "block";
   } else {
     direccionInput.style.display = "none";
     direccionInput.value = "";
+    infoPuntoFisico.style.display = "none";
   }
 }
 
@@ -237,6 +244,8 @@ function confirmarPedido() {
   
   if (tipoEntrega === "domicilio") {
     mensaje += `Dirección: ${direccion}\n`;
+  } else if (tipoEntrega === "fisico") {
+    mensaje += `Ubicación: https://maps.app.goo.gl/TibuC5Mvcj7xZtX29\n`;
   }
   
   mensaje += `\n`;
