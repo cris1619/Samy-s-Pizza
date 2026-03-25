@@ -43,6 +43,7 @@ function mostrarMenu(data) {
           <img src="${pizza.imagen}" class="card-img-top">
           <div class="card-body bg-dark text-white text-center">
             <h5>${pizza.nombre}</h5>
+            <p class="text-warning fw-bold">${pizza.precio}</p>
           </div>
         </div>
       </div>
