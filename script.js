@@ -7,6 +7,7 @@ function cargarMenu() {
     menuData = JSON.parse(menuLS);
     mostrarMenu(menuData);
     generarBotonesCategorias(menuData);
+    mostrarCardPersonalizada();
   } else {
     fetch('menu.json')
       .then(res => res.json())
@@ -14,6 +15,7 @@ function cargarMenu() {
         menuData = data;
         mostrarMenu(data);
         generarBotonesCategorias(data);
+        mostrarCardPersonalizada();
       });
   }
 }
@@ -49,9 +51,91 @@ function mostrarMenu(data) {
       </div>
     `;
 
-    
-
   });
+}
+
+function mostrarCardPersonalizada() {
+  const container = document.getElementById('personalizadoContainer');
+  if (!container) return;
+
+  // Calcular precio base: mitad de las dos pizzas más baratas
+  const pizzasNoBebidas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida');
+  const preciosOrdenados = pizzasNoBebidas.map(p => parseInt(p.precio.replace(/\D/g, ''))).sort((a, b) => a - b);
+  const precioBase = Math.round((preciosOrdenados[0] + preciosOrdenados[1]) / 2);
+
+  container.innerHTML = `
+    <div class="col-6 col-md-4">
+      <div class="card pizza-card" onclick="abrirModalMitiMiti()">
+        <img src="img/miti.jpg" class="card-img-top" alt="Pizza Miti Miti">
+        <div class="card-body bg-dark text-white text-center">
+          <h5>Pizza Miti Miti</h5>
+          <p class="text-warning fw-bold">Desde $${precioBase.toLocaleString('es-CO')}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function actualizarPrecioMitiMiti() {
+  const pizza1 = document.getElementById('modalMitiMitiSelect1') || document.getElementById('selectPizza1');
+  const pizza2 = document.getElementById('modalMitiMitiSelect2') || document.getElementById('selectPizza2');
+
+  if (!pizza1 || !pizza2) return;
+
+  const precio1 = obtenerPrecioPizza(pizza1.value);
+  const precio2 = obtenerPrecioPizza(pizza2.value);
+  const mitad1 = Math.round(precio1 / 2);
+  const mitad2 = Math.round(precio2 / 2);
+  const total = mitad1 + mitad2;
+
+  const precioElement = document.getElementById('modalMitiMitiPrecio') || document.getElementById('precioPersonalizado');
+  if (precioElement) precioElement.innerText = `$${total.toLocaleString('es-CO')}`;
+
+  const mitad1Element = document.getElementById('mitad1');
+  const mitad2Element = document.getElementById('mitad2');
+  if (mitad1Element) mitad1Element.innerText = `Mitad: $${mitad1.toLocaleString('es-CO')}`;
+  if (mitad2Element) mitad2Element.innerText = `Mitad: $${mitad2.toLocaleString('es-CO')}`;
+}
+
+function obtenerPrecioPizza(nombre) {
+  const pizza = menuData.find(p => p.nombre === nombre);
+  return pizza ? parseInt(pizza.precio.replace(/\D/g, '')) : 0;
+}
+
+function agregarPizzaMitiMiti() {
+  const nombre1 = (document.getElementById('modalMitiMitiSelect1') || document.getElementById('selectPizza1')).value;
+  const nombre2 = (document.getElementById('modalMitiMitiSelect2') || document.getElementById('selectPizza2')).value;
+
+  if (!nombre1 || !nombre2) {
+    mostrarAlerta('⚠️ Selecciona las dos pizzas para crear la Miti Miti', 'warning');
+    return;
+  }
+
+  const precio1 = obtenerPrecioPizza(nombre1);
+  const precio2 = obtenerPrecioPizza(nombre2);
+  const precioTotal = Math.round(precio1 / 2) + Math.round(precio2 / 2);
+
+  const nombre = `Miti Miti: ${nombre1} + ${nombre2}`;
+
+  let item = carrito.find(p => p.nombre === nombre && p.porciones === 'miti miti');
+
+  if (item) {
+    item.cantidad++;
+  } else {
+    carrito.push({
+      nombre,
+      precio: precioTotal,
+      cantidad: 1,
+      porciones: 'miti miti',
+      categoria: 'especial'
+    });
+  }
+
+  animarCarrito();
+  guardarCarrito();
+  cerrarTodosLosModales();
+  reproducirSonido();
+  mostrarAlerta(`✅ ${nombre} agregado al carrito`, 'success');
 }
 
 function filtrar(categoria) {
@@ -81,6 +165,24 @@ function abrirModal(nombre, descripcion, precio, imagen) {
   }
 
   let modal = new bootstrap.Modal(document.getElementById('pizzaModal'));
+  modal.show();
+}
+
+function abrirModalMitiMiti() {
+  const pizzas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida');
+  const opciones = pizzas.map(p => `<option value="${p.nombre}">${p.nombre} - ${p.precio}</option>`).join('');
+
+  document.getElementById("modalMitiMitiImg").src = "img/miti.jpg";
+  document.getElementById("modalMitiMitiSelect1").innerHTML = `<option value="">-- Elige una pizza --</option>${opciones}`;
+  document.getElementById("modalMitiMitiSelect2").innerHTML = `<option value="">-- Elige una pizza --</option>${opciones}`;
+  document.getElementById("modalMitiMitiPrecio").innerText = "$0";
+  document.getElementById("mitad1").innerText = "Mitad: $0";
+  document.getElementById("mitad2").innerText = "Mitad: $0";
+
+  document.getElementById("modalMitiMitiSelect1").addEventListener('change', actualizarPrecioMitiMiti);
+  document.getElementById("modalMitiMitiSelect2").addEventListener('change', actualizarPrecioMitiMiti);
+
+  let modal = new bootstrap.Modal(document.getElementById('mitiMitiModal'));
   modal.show();
 }
 

@@ -472,6 +472,7 @@
     <button class="cat-btn cat-promo"          onclick="filtrar('promociones')">Promociones</button>
   </div>
 
+  <div class="row g-4" id="personalizadoContainer"></div>
   <div class="row g-4" id="menuContainer"></div>
 </section>
 
@@ -509,6 +510,43 @@
                 document.getElementById('modalPrecio').innerText
               )">
               <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL MITI MITI ═══ -->
+<div class="modal fade" id="mitiMitiModal" tabindex="-1" aria-labelledby="mitiMitiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modal-custom border-0">
+      <div class="modal-body p-0">
+        <img id="modalMitiMitiImg" class="modal-img" alt="Pizza Miti Miti">
+        <div class="p-4 text-center">
+          <h3 class="mb-3 fw-bold" style="color: #ff3c00; font-family: 'Playfair Display', serif;">Pizza Miti Miti</h3>
+          <p class="mb-3 text-muted" style="font-size: 1.1rem; line-height: 1.5;">Elige dos pizzas para crear tu combinación perfecta. El precio es la mitad de cada una.</p>
+          <div class="row gy-3 mb-4">
+            <div class="col-12 col-md-6">
+              <label class="form-label text-white">Primera pizza</label>
+              <select id="modalMitiMitiSelect1" class="form-control">
+                <option value="">-- Elige una pizza --</option>
+              </select>
+              <small id="mitad1" class="text-muted">Mitad: $0</small>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label text-white">Segunda pizza</label>
+              <select id="modalMitiMitiSelect2" class="form-control">
+                <option value="">-- Elige una pizza --</option>
+              </select>
+              <small id="mitad2" class="text-muted">Mitad: $0</small>
+            </div>
+          </div>
+          <h4 id="modalMitiMitiPrecio" class="mb-4 fw-bold" style="color: #ffd700; font-size: 1.5rem;">$0</h4>
+          <div class="d-flex justify-content-center">
+            <button class="btn btn-danger px-4 py-2 fw-bold rounded-pill shadow-sm" onclick="agregarPizzaMitiMiti()">
+              <i class="bi bi-cart-plus me-2"></i>Agregar Miti Miti
             </button>
           </div>
         </div>
