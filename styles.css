@@ -1,7 +1,7 @@
 body {
   background: #111;
   color: white;
-  font-family: "Exo", sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 .titulo {
@@ -18,7 +18,7 @@ body {
 
 body {
   margin: 0;
-  font-family: "Exo", sans-serif;
+  font-family: "DM Sans", sans-serif;
   background: url('img/fondo.jpg') no-repeat center center fixed;
   background-size: cover;
   color: white;
@@ -41,8 +41,11 @@ body::before {
 }
 
 .pizza-card img {
-  height: 180px;
-  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  object-fit: contain;
+  background: #1a1210;
 }
 
 /* Modal */

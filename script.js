@@ -4,7 +4,7 @@ let enviando = false;
 function cargarMenu() {
   const menuLS = localStorage.getItem("menu");
   if (menuLS) {
-    menuData = JSON.parse(menuLS);
+    menuData = asegurarPromocion(JSON.parse(menuLS));
     mostrarMenu(menuData);
     generarBotonesCategorias(menuData);
     mostrarCardPersonalizada();
@@ -12,14 +12,27 @@ function cargarMenu() {
     fetch('menu.json')
       .then(res => res.json())
       .then(data => {
-        menuData = data;
-        mostrarMenu(data);
-        generarBotonesCategorias(data);
+        menuData = asegurarPromocion(data);
+        mostrarMenu(menuData);
+        generarBotonesCategorias(menuData);
         mostrarCardPersonalizada();
       });
   }
 }
 
+function asegurarPromocion(data) {
+  if (!data.some(producto => producto.tipo === 'promocion')) {
+    data.push({
+      nombre: 'Promoción',
+      descripcion: 'Conoce nuestra promoción vigente por WhatsApp.',
+      precio: '',
+      imagen: 'img/promo.jpg',
+      categoria: 'promociones',
+      tipo: 'promocion'
+    });
+  }
+  return data;
+}
 function generarBotonesCategorias(data) {
   const categorias = [...new Set(data.map(p => p.categoria))];
   const container = document.querySelector('.categorias');
@@ -38,11 +51,26 @@ function mostrarMenu(data) {
   container.innerHTML = "";
 
   data.forEach(pizza => {
+    if (pizza.tipo === 'promocion') {
+      const mensaje = encodeURIComponent('¡Hola! Vi la promoción de Samy\'s Pizza y quiero saber más.');
+      container.innerHTML += `
+        <div class="col-6 col-md-4">
+          <a class="card pizza-card text-decoration-none" href="https://wa.me/573144144969?text=${mensaje}" target="_blank" rel="noopener" aria-label="Conocer más sobre la promoción por WhatsApp">
+            <img src="${pizza.imagen}" class="card-img-top" alt="${pizza.nombre}">
+            <div class="card-body bg-dark text-white text-center">
+              <h5>${pizza.nombre}</h5>
+              <p class="text-warning fw-bold mb-0"><i class="bi bi-whatsapp"></i> ¿Quieres saber más?</p>
+            </div>
+          </a>
+        </div>
+      `;
+      return;
+    }
 
     container.innerHTML += `
       <div class="col-6 col-md-4">
         <div class="card pizza-card" onclick="abrirModal('${pizza.nombre}', '${pizza.descripcion}', '${pizza.precio}', '${pizza.imagen}')">
-          <img src="${pizza.imagen}" class="card-img-top">
+          <img src="${pizza.imagen}" class="card-img-top" alt="${pizza.nombre}">
           <div class="card-body bg-dark text-white text-center">
             <h5>${pizza.nombre}</h5>
             <p class="text-warning fw-bold">${pizza.precio}</p>
@@ -50,7 +78,6 @@ function mostrarMenu(data) {
         </div>
       </div>
     `;
-
   });
 }
 
@@ -59,7 +86,7 @@ function mostrarCardPersonalizada() {
   if (!container) return;
 
   // Calcular precio base: mitad de las dos pizzas más baratas
-  const pizzasNoBebidas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida');
+  const pizzasNoBebidas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida' && p.tipo !== 'promocion');
   const preciosOrdenados = pizzasNoBebidas.map(p => parseInt(p.precio.replace(/\D/g, ''))).sort((a, b) => a - b);
   const precioBase = Math.round((preciosOrdenados[0] + preciosOrdenados[1]) / 2);
 
@@ -169,7 +196,7 @@ function abrirModal(nombre, descripcion, precio, imagen) {
 }
 
 function abrirModalMitiMiti() {
-  const pizzas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida');
+  const pizzas = menuData.filter(p => p.categoria.toLowerCase() !== 'bebida' && p.tipo !== 'promocion');
   const opciones = pizzas.map(p => `<option value="${p.nombre}">${p.nombre} - ${p.precio}</option>`).join('');
 
   document.getElementById("modalMitiMitiImg").src = "img/miti.jpg";
