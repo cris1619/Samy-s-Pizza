@@ -55,7 +55,7 @@ function mostrarMenu(data) {
       const mensaje = encodeURIComponent('¡Hola! Vi la promoción de Samy\'s Pizza y quiero saber más.');
       container.innerHTML += `
         <div class="col-6 col-md-4">
-          <a class="card pizza-card text-decoration-none" href="https://wa.me/573144144969?text=${mensaje}" target="_blank" rel="noopener" aria-label="Conocer más sobre la promoción por WhatsApp">
+          <a class="card pizza-card text-decoration-none" href="https://wa.me/573138380779?text=${mensaje}" target="_blank" rel="noopener" aria-label="Conocer más sobre la promoción por WhatsApp">
             <img src="${pizza.imagen}" class="card-img-top" alt="${pizza.nombre}">
             <div class="card-body bg-dark text-white text-center">
               <h5>${pizza.nombre}</h5>
@@ -405,7 +405,7 @@ function confirmarPedido() {
 
   mensaje += `TOTAL: $${total}`;
 
-  let url = `https://wa.me/573144144969?text=${encodeURIComponent(mensaje)}`;
+  let url = `https://wa.me/573138380779?text=${encodeURIComponent(mensaje)}`;
 
   guardarPedido(nombre, telefono, tipoEntrega, direccion, carrito, total);
 
